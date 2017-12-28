@@ -39,18 +39,18 @@ class ViewController: UIViewController, EngineWidgetDelegate {
         super.viewDidLoad()
         
         engineWidget.delegate = self
-        btTraining.layer.borderColor = UIColor.whiteColor().CGColor
+        btTraining.layer.borderColor = UIColor.white.cgColor
         
         currentPow = 0.0
         currentAct = Mental_Neutral
         isTraining = false
         
-        NSTimer.scheduledTimerWithTimeInterval(0.1, target: self, selector: Selector("updateCubePosition"), userInfo: nil, repeats: true)
+        Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(ViewController.updateCubePosition), userInfo: nil, repeats: true)
 
         // Do any additional setup after loading the view, typically from a nib.
     }
 
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
     }
     
@@ -59,15 +59,15 @@ class ViewController: UIViewController, EngineWidgetDelegate {
         // Dispose of any resources that can be recreated.
     }
     
-    @IBAction func showTableAction(sender: UIButton) {
-        self.tableAction.hidden = !self.tableAction.hidden
+    @IBAction func showTableAction(_ sender: UIButton) {
+        self.tableAction.isHidden = !self.tableAction.isHidden
     }
     
     
-    @IBAction func trainingAction(sender: UIButton) {
+    @IBAction func trainingAction(_ sender: UIButton) {
         if !isTraining
         {
-            let action = dictionaryAction[self.btAction.titleForState(UIControlState.Normal)!]
+            let action = dictionaryAction[self.btAction.title(for: UIControlState())!]
             engineWidget.setActiveAction(action!)
             engineWidget.setTrainingAction(action!)
             engineWidget.setTrainingControl(Mental_Start)
@@ -75,14 +75,14 @@ class ViewController: UIViewController, EngineWidgetDelegate {
         }
     }
     
-    @IBAction func clearData(sender: UIButton) {
-        let action = dictionaryAction[self.btAction.titleForState(UIControlState.Normal)!]
+    @IBAction func clearData(_ sender: UIButton) {
+        let action = dictionaryAction[self.btAction.title(for: UIControlState())!]
         engineWidget.clearTrainingData(action!)
     }
     
-    func updateCubePosition() {
+    @objc func updateCubePosition() {
         
-        UIView.animateWithDuration(0.2, animations: ({
+        UIView.animate(withDuration: 0.2, animations: ({
             let range = self.currentPow * 4
             
             //move cube to left or right direction
@@ -108,40 +108,40 @@ class ViewController: UIViewController, EngineWidgetDelegate {
             //move cube to forward or backward direction
             if (self.currentAct.rawValue == Mental_Pull.rawValue || self.currentAct.rawValue == Mental_Push.rawValue) && range > 0
             {
-                self.viewCube.transform = self.currentAct.rawValue == Mental_Push.rawValue ? CGAffineTransformScale(CGAffineTransformIdentity, max(0.3, self.viewCube.transform.a - self.currentPow/4), max(0.3, self.viewCube.transform.d - self.currentPow/4)) : CGAffineTransformScale(CGAffineTransformIdentity, min(2.3, self.viewCube.transform.a + self.currentPow/4), min(2.3, self.viewCube.transform.d + self.currentPow/4))
+                self.viewCube.transform = self.currentAct.rawValue == Mental_Push.rawValue ? CGAffineTransform.identity.scaledBy(x: max(0.3, self.viewCube.transform.a - self.currentPow/4), y: max(0.3, self.viewCube.transform.d - self.currentPow/4)) : CGAffineTransform.identity.scaledBy(x: min(2.3, self.viewCube.transform.a + self.currentPow/4), y: min(2.3, self.viewCube.transform.d + self.currentPow/4))
             }
             else if self.viewCube.transform.a != 1
             {
                 let scale : CGFloat! = self.viewCube.transform.a < 1 ? 0.05 : -0.05
-                self.viewCube.transform = CGAffineTransformScale(CGAffineTransformIdentity, max(1, self.viewCube.transform.a + scale), max(1, self.viewCube.transform.d + scale))
+                self.viewCube.transform = CGAffineTransform.identity.scaledBy(x: max(1, self.viewCube.transform.a + scale), y: max(1, self.viewCube.transform.d + scale))
             }
         }))
     }
 }
 
 extension ViewController : UITableViewDataSource, UITableViewDelegate {
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return dictionaryAction.keys.count
     }
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = UITableViewCell(style: UITableViewCellStyle.Default, reuseIdentifier: "cellString")
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = UITableViewCell(style: UITableViewCellStyle.default, reuseIdentifier: "cellString")
         cell.textLabel?.text = Array(dictionaryAction.keys)[indexPath.row]
         let action = dictionaryAction[Array(dictionaryAction.keys)[indexPath.row]]
         if engineWidget.isActionTrained(action!)
         {
-            cell.accessoryType = UITableViewCellAccessoryType.Checkmark
+            cell.accessoryType = UITableViewCellAccessoryType.checkmark
         }
         else
         {
-            cell.accessoryType = UITableViewCellAccessoryType.None
+            cell.accessoryType = UITableViewCellAccessoryType.none
         }
         return cell
     }
     
-    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        self.tableAction.hidden = true
-        self.btAction.setTitle(Array(dictionaryAction.keys)[indexPath.row], forState: UIControlState.Normal)
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        self.tableAction.isHidden = true
+        self.btAction.setTitle(Array(dictionaryAction.keys)[indexPath.row], for: UIControlState())
         
         let action = dictionaryAction[Array(dictionaryAction.keys)[indexPath.row]]
         self.labelSkillRating.text = "SkillRating: \(engineWidget.getSkillRating(action!))%"
@@ -149,12 +149,12 @@ extension ViewController : UITableViewDataSource, UITableViewDelegate {
 }
 
 extension ViewController {
-    func emoStateUpdate(currentAction: MentalAction_t, power currentPower: Float)
+    func emoStateUpdate(_ currentAction: MentalAction_t, power currentPower: Float)
     {
         currentAct = currentAction
         currentPow = CGFloat(currentPower)
         self.constraintPower.constant = self.viewPowerBar.frame.height * CGFloat(currentPower)
-        UIView.animateWithDuration(0.1, animations: ({
+        UIView.animate(withDuration: 0.1, animations: ({
             self.viewPower.layoutIfNeeded()
 //            println("power \(currentPower) \(self.constraintPower.constant)")
         }))
@@ -166,21 +166,21 @@ extension ViewController {
     
     func onMentalCommandTrainingCompleted() {
         isTraining = false
-        let alert = UIAlertController(title: "Training Completed", message: "Action was trained completed", preferredStyle: UIAlertControllerStyle.Alert)
-        alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: nil))
-        self.presentViewController(alert, animated: true, completion: nil)
+        let alert = UIAlertController(title: "Training Completed", message: "Action was trained completed", preferredStyle: UIAlertControllerStyle.alert)
+        alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.default, handler: nil))
+        self.present(alert, animated: true, completion: nil)
         self.tableAction.reloadData()
     }
     
     func onMentalCommandTrainingSuccessed() {
-        let alert = UIAlertController(title: "Training Successed", message: "Do you want to accept this training?", preferredStyle: UIAlertControllerStyle.Alert)
-        alert.addAction(UIAlertAction(title: "Reject", style: UIAlertActionStyle.Default, handler: { action in
+        let alert = UIAlertController(title: "Training Successed", message: "Do you want to accept this training?", preferredStyle: UIAlertControllerStyle.alert)
+        alert.addAction(UIAlertAction(title: "Reject", style: UIAlertActionStyle.default, handler: { action in
             self.engineWidget.setTrainingControl(Mental_Reject)
         }))
-        alert.addAction(UIAlertAction(title: "Accept", style: UIAlertActionStyle.Default, handler: { action in
+        alert.addAction(UIAlertAction(title: "Accept", style: UIAlertActionStyle.default, handler: { action in
             self.engineWidget.setTrainingControl(Mental_Accept)
         }))
-        self.presentViewController(alert, animated: true, completion: nil)
+        self.present(alert, animated: true, completion: nil)
     }
     
     func onMentalCommandTrainingFailed() {
@@ -188,9 +188,9 @@ extension ViewController {
     }
     
     func onMentalCommandTrainingDataErased() {
-        let alert = UIAlertController(title: "Erase Completed", message: "Action was erased completed", preferredStyle: UIAlertControllerStyle.Alert)
-        alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: nil))
-        self.presentViewController(alert, animated: true, completion: nil)
+        let alert = UIAlertController(title: "Erase Completed", message: "Action was erased completed", preferredStyle: UIAlertControllerStyle.alert)
+        alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.default, handler: nil))
+        self.present(alert, animated: true, completion: nil)
         self.tableAction.reloadData()
     }
     

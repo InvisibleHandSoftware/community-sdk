@@ -49,7 +49,7 @@ extern "C" {
 #include "FacialExpressionDetection.h"
 #include "MentalCommandDetection.h"
 #include "IEmotivProfile.h"
-#include "EmotivLicense.h"
+//#include "EmotivLicense.h"
 
 
 

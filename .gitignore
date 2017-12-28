@@ -6,4 +6,8 @@ build/
 *.xml~
 *.out
 *.class
+## User settings
+xcuserdata/
+contents.xcworkspacedata/
+
 
